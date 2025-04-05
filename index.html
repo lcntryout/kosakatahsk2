@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Mandarin HSK2 by LCN</title>
+    <style>
+        body {
+            font-family: Arial, Simsun;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        /* Category Selector */
+        .category-selector {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .category-btn {
+            padding: 10px 15px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .category-btn:hover {
+            background-color: #8e44ad;
+        }
+        .category-btn.active {
+//            background-color: #8e44ad;
+            background-color: #3498db;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        
+        /* Mode Selector */
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .mode-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .mode-btn.active {
+//            background-color: #2980b9;
+            background-color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        /* Flashcard Style */
+        .flashcard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .flashcard {
+            width: 500px;
+            height: 300px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .character {
+            font-size: 120px;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+        .pinyin {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        .meaning {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .audio-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .audio-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        /* Quiz Mode Styles */
+        .quiz-question {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .quiz-option {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .quiz-option:hover {
+            background-color: #e9ecef;
+        }
+        .quiz-option.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .quiz-option.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .quiz-feedback {
+            font-size: 20px;
+            margin-bottom: 20px;
+            min-height: 30px;
+            text-align: center;
+        }
+        .quiz-next {
+            padding: 10px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Dictation Mode Styles */
+        .dictation-input {
+            width: 200px;
+            height: 50px;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .dictation-check {
+            padding: 10px 20px;
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+//            background-color: #6c757d;
+            background-color: #ffc107;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .score-display {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Flashcard Mandarin HSK2</h1>
+    
+    <!-- Category Selector -->
+    <div class="category-selector">
+        <button class="category-btn active" onclick="setCategory('all')">Semua</button>
+        <button class="category-btn" onclick="setCategory('Bab1')">Bab1</button>
+        <button class="category-btn" onclick="setCategory('Bab2')">Bab2</button>
+        <button class="category-btn" onclick="setCategory('Bab3')">Bab3</button>
+        <button class="category-btn" onclick="setCategory('Bab4')">Bab4</button>
+        <button class="category-btn" onclick="setCategory('Bab5')">Bab5</button>
+        <button class="category-btn" onclick="setCategory('Bab6')">Bab6</button>
+        <button class="category-btn" onclick="setCategory('Bab7')">Bab7</button>
+        <button class="category-btn" onclick="setCategory('Bab8')">Bab8</button>
+        <button class="category-btn" onclick="setCategory('Bab9')">Bab9</button>
+        <button class="category-btn" onclick="setCategory('Bab10')">Bab10</button>
+        <button class="category-btn" onclick="setCategory('Bab11')">Bab11</button>
+        <button class="category-btn" onclick="setCategory('Bab12')">Bab12</button>
+        <button class="category-btn" onclick="setCategory('Bab13')">Bab13</button>
+        <button class="category-btn" onclick="setCategory('Bab14')">Bab14</button>
+        <button class="category-btn" onclick="setCategory('Bab15')">Bab15</button>
+    </div>
+    
+    <!-- Mode Selector -->
+    <div class="mode-selector">
+        <button class="mode-btn active" onclick="setMode('flashcard')">Flashcard</button>
+        <button class="mode-btn" onclick="setMode('quiz')">Latihan</button>
+        <button class="mode-btn" onclick="setMode('dictation')">Dikte</button>
+    </div>
+    
+    <div class="score-display">
+        Skor: <span id="score">0</span> dari <span id="total">0</span>
+    </div>
+    
+    <div class="flashcard-container">
+        <!-- Flashcard Mode -->
+        <div id="flashcard-mode" class="mode-content">
+            <div class="flashcard">
+                <div class="character" id="fc-character">人</div>
+                <div class="pinyin" id="fc-pinyin">rén</div>
+                <div class="meaning" id="fc-meaning">orang</div>
+                <button class="audio-btn" onclick="playCurrentAudio()">Dengarkan</button>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevCard()">Sebelumnya</button>
+                <button class="nav-btn" onclick="shuffleCards()">Acak</button>
+                <button class="nav-btn" onclick="nextCard()">Berikutnya</button>
+            </div>
+        </div>
+        
+        <!-- Quiz Mode -->
+        <div id="quiz-mode" class="mode-content" style="display:none;">
+            <div class="quiz-question" id="quiz-question">Apa arti dari karakter ini?</div>
+            <div class="character" id="quiz-character">人</div>
+            
+            <div class="quiz-options" id="quiz-options">
+                <!-- Options will be generated by JavaScript -->
+            </div>
+            
+            <div class="quiz-feedback" id="quiz-feedback"></div>
+            <button class="quiz-next" id="quiz-next" onclick="nextQuizQuestion()" style="display:none;">Lanjut</button>
+        </div>
+        
+        <!-- Dictation Mode -->
+        <div id="dictation-mode" class="mode-content" style="display:none;">
+            <div class="quiz-question">Tulis karakter yang Anda dengar:</div>
+            <button class="audio-btn" onclick="playDictationAudio()">Putar Audio</button>
+            
+            <input type="text" class="dictation-input" id="dictation-input" placeholder="Tulis disini...">
+            <button class="dictation-check" onclick="checkDictation()">Periksa</button>
+            
+            <div class="quiz-feedback" id="dictation-feedback"></div>
+            <button class="quiz-next" id="dictation-next" onclick="nextDictation()" style="display:none;">Lanjut</button>
+        </div>
+    </div>
+
+    <script>
+        // Data vocabulary dengan pengelompokan
+        const vocabulary = [
+            // BAB 1
+            { character: "一起", pinyin: "yìqǐ", meaning: "bersama-sama", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/gi4zauej7wndeey35yi40/.mp3?rlkey=datfvhyb2lfnj005e76iwoowc&st=8sz2i477&dl=0" },
+            { character: "为什么", pinyin: "wèishénme", meaning: "mengapa", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/iqiqbcxoqxbx2dnc51twl/.mp3?rlkey=hcc2r5rj900doe4krooknyuae&st=w95jvpt0&dl=0" },
+            { character: "也", pinyin: "yě", meaning: "juga", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/o1fs3jo5eqsf0obz8sp3z/.mp3?rlkey=4mi5tmx6qftwgtq8j4yht0p5y&st=ojwsz7s7&dl=0" },
+            { character: "它", pinyin: "tā", meaning: "dia （u/hewan,benda）", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/2lr9aqszyo5akd765qp67/.mp3?rlkey=qfdau269d95qfu8mrumdd1et2&st=ar3qbxvn&dl=0" },
+            { character: "新", pinyin: "xīn", meaning: "baru", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/m2kmtqlxha9au2htmzagv/.mp3?rlkey=jsemugykf73yqb170wx61ksco&st=g89619fm&dl=0" },
+            { character: "旅游", pinyin: "lǔyóu", meaning: "tamasya/liburan", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/d407yng2vjmfyonlonqwt/.mp3?rlkey=4ow1ugj3msvkl8y2ek03yxx2g&st=82vnmhj3&dl=0" },
+            { character: "最", pinyin: "zuì", meaning: "paling", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/8hbkk3slmnd8s2zbihvms/.mp3?rlkey=lua4npbysw1casconkpb1ak7e&st=ke3fprc6&dl=0" },
+            { character: "眼睛", pinyin: "yǎnjing", meaning: "mata", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/0ewc07nqs3p0wjgmq5cml/.mp3?rlkey=n87bo6plndd7efl0k0dqyrg7w&st=ljrjfowi&dl=0" },
+            { character: "花花", pinyin: "huāhua", meaning: "nama kucing", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/f88ci3pehqqs4lrp4e8nd/.mp3?rlkey=15qb4arfswdv2ms42gaglu2ov&st=zblew7oc&dl=0" },
+            { character: "要", pinyin: "yào", meaning: "mau/harus", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/r5plro3pmdh8p4otiiuiz/.mp3?rlkey=vkdt8ax0lk3ubez2pc6o38p5x&st=ml4g0vxo&dl=0" },
+            { character: "觉得", pinyin: "juéde", meaning: "merasa", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/mbtzmtjfcjo5dscvju919/.mp3?rlkey=zx3dabuiua94y9tpfsw70rqx1&st=mriksh8w&dl=0" },
+            { character: "踢足球", pinyin: "tīzúqiú", meaning: "bermain sepak bola", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/jyvvg214eeqgxkc8bdkra/.mp3?rlkey=j11x7zc6qjo8t5cvxoofu2k80&st=x8vo0tyg&dl=0" },
+            { character: "运动", pinyin: "yùndòng", meaning: "olahraga", category: "Bab1",audio: "https://dl.dropboxusercontent.com/scl/fi/n4k0vgb3j0lu0y3d11udt/.mp3?rlkey=9cqygqiqukhzyptw5hjpd27si&st=2n5ne807&dl=0" },
+       
+            // Kelompok Bab2
+            { character: "休息", pinyin: "xiūxi", meaning: "istirahat",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/x0os9b74lu5s0rg71xl7f/.mp3?rlkey=hdz2x83fz0a1hznt4ez8a9glo&st=se4dcoap&dl=0" },
+            { character: "出", pinyin: "chū", meaning: "keluar",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/qdt5rnh93e7b8491vovgd/.mp3?rlkey=x5y76c5yqfn14v9c1waur0oyt&st=a06l1fif&dl=0" },
+            { character: "出院", pinyin: "chū yuàn", meaning: "keluar rumah sakit",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/frl46qwnnh8f50fenob1r/.mp3?rlkey=3mb5j6tobd0nenigtmp1sypch&st=kfi4f06h&dl=0" },
+            { character: "忙", pinyin: "máng", meaning: "sibuk", category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/c20xuazjw19newrrm5h1m/.mp3?rlkey=89lyj4bg4n07t50pd1s1z5rqd&st=w604kfqn&dl=0" },
+            { character: "早上", pinyin: "zǎoshang", meaning: "pagi (hari)",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/qw8fph3fp6tfrzemtd0kx/.mp3?rlkey=ota88e8nst1idkarjzafwz8kx&st=12xigjoz&dl=0" },
+            { character: "时间", pinyin: "shíjiān", meaning: "waktu",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/wvstgtki54uk6ijitypby/.mp3?rlkey=dtlq1mx9tb6qf2q12dky2f0qc&st=jpkwah7k&dl=0" },
+            { character: "每", pinyin: "měi", meaning: "tiap/setiap",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/bza897h2r9zt0ye71deht/.mp3?rlkey=qa1yyfdq26y2tbt28lae10gd7&st=h2jgz2hw&dl=0" },
+            { character: "生病", pinyin: "shēngbìng", meaning: "sakit",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/d97hqjte22aul1llgk87x/.mp3?rlkey=50ic4hqez13csa4pdbqe57aew&st=tskmwqm8&dl=0" },
+            { character: "知道", pinyin: "zhīdào", meaning: "tahu",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/b9qt7jp13s0oprasqvy5z/.mp3?rlkey=hbmus7nkloa4daghmod9cvzsr&st=duqytw0v&dl=0" },
+            { character: "米", pinyin: "mǐ", meaning: "meter/beras",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/biy2xj0bz1mzxmswinudc/.mp3?rlkey=fe6f33wynid82nh1l0u7pm66r&st=vfcm3r6z&dl=0" },
+            { character: "药", pinyin: "yào", meaning: "obat",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/3t50rmxal9lmxyt2ehu54/.mp3?rlkey=o1pzppilnoocu5ijffos7l4sr&st=p0qhal9p&dl=0" },
+            { character: "起床", pinyin: "qǐchuáng", meaning: "bangun tidur",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/fdpez4hsykbjasxg6ge4o/.mp3?rlkey=9krcu4sl2zg1hllks6e62gdhm&st=2qkpd92w&dl=0" },
+            { character: "跑步", pinyin: "pǎobù", meaning: "joging",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/77meth0s2qprd5ivxz4px/.mp3?rlkey=12zxxjuunskirm1ndobsee43h&st=ccowsa7m&dl=0" },
+            { character: "身体", pinyin: "shēntǐ", meaning: "badan/tubuh",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/4p5jfudoel8vj1m2cmor6/.mp3?rlkey=677etek3lue1vto76iyy3vv78&st=qy9fdqn9&dl=0" },
+            { character: "高", pinyin: "gāo", meaning: "tinggi",category: "Bab2", audio: "https://dl.dropboxusercontent.com/scl/fi/rp57vjqk7ww96gsg8yns9/.mp3?rlkey=hkg7i0yf1ad3bowhwzwveimi4&st=kmmdr7bv&dl=0" },
+            
+            // Kelompok Bab3
+            { character: "一下", pinyin: "yíxià", meaning: "sebentar ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/6he8mdsmetaytba8u2l78/.mp3?rlkey=vwrnaow8o21ui3ksv8ilbsa1x&st=pma1bqt2&dl=0" },
+            { character: "丈夫", pinyin: "zhāngfu", meaning: "suami ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/wyemhjgqdldkre1xfkxmd/.mp3?rlkey=9uh66xjxyltx627ukeht4yne6&st=cdiurbog&dl=0" },
+            { character: "千", pinyin: "qiān", meaning: "ribu ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/gfrlsrxf0eqvii2wzp3cf/.mp3?rlkey=p5erl2poa66k2o6vn5clip21z&st=off3a0nz&dl=0" },
+            { character: "左边", pinyin: "zuǒbian", meaning: "(sebelah) kiri", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/zbklohgpznqjvbqmokyey/.mp3?rlkey=jxfu5vr4inq6uvwl7m7mvdfao&st=vt8ssd2s&dl=0" },
+            { character: "房间", pinyin: "fángjiān", meaning: "kamar ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/0x3oc1bu72mjqe7f7ehdd/.mp3?rlkey=gbt6xlt1qgzmfeuh5nedj5fi5&st=epswdduq&dl=0" },
+            { character: "手表", pinyin: "shóubiǎo", meaning: "jam tangan ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/6hfqubyl9bmwg5j2m3g93/.mp3?rlkey=hfkvfbrswwzfcriu359mt7bjj&st=wsdwmhwm&dl=0" },
+            { character: "报纸", pinyin: "bàozhǐ", meaning: "koran", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/3svubqo7kjdp4iubgyvc1/.mp3?rlkey=w7dq9ztfaz10j8e0ih26fl1e4&st=ds7eenju&dl=0" },
+            { character: "旁边", pinyin: "pángbian", meaning: "samping/sebelah ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/alj8h34fl9cwdu678wdat/.mp3?rlkey=stpp351v9dghzzs7h53c80fd2&st=n0dtyzpl&dl=0" },
+            { character: "牛奶", pinyin: "niúnǎi", meaning: "susu (sapi) ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/6oal6kbsomlyh5hrxcb8d/.mp3?rlkey=il0antsv3md0r7f5zklaimr6s&st=d07ue1hd&dl=0" },
+            { character: "真", pinyin: "zhēn", meaning: "sangat ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/3x4p8tzj84ng1ioa50c5v/.mp3?rlkey=ky2wu9ohl5vm90r6kg0xndv6y&st=6jl8yamv&dl=0" },
+            { character: "粉", pinyin: "fěn", meaning: "merah muda/tepung ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/4p7c4tehmrlmnj3taoaqx/.mp3?rlkey=ndgxseirw1lb8p23pghiqpge3&st=nt2tfx2q&dl=0" },
+            { character: "粉色", pinyin: "fěnsè", meaning: "(warna) merah muda ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/0hsovczruu2bjj873899l/.mp3?rlkey=be5cl4r4tymr7bghwy0zd1n1s&st=8yjht5c0&dl=0" },
+            { character: "红", pinyin: "hóng", meaning: "merah ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/556dgx80aoqtczkew5d46/.mp3?rlkey=qtp39eijwjjmc2qziozj26ue5&st=t6oppv9w&dl=0" },
+            { character: "红色", pinyin: "hóngsè", meaning: "(warna) merah ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/98wn73ytnutvkc7rntp29/.mp3?rlkey=3yf2pz5j2c5sv8ulo5atevfka&st=k264crpn&dl=0" },
+            { character: "送", pinyin: "sòng", meaning: "mengantar", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/8kaf9pbdq48686awa4d8h/.mp3?rlkey=05d35wf09iurc92bzlg053th9&st=q3rbaxss&dl=0" },
+            { character: "颜色", pinyin: "yánsè", meaning: "warna ", category: "Bab3", audio: "https://dl.dropboxusercontent.com/scl/fi/hazsaizwt1iefkmvzt0gp/.mp3?rlkey=tkd594h0hpn6cc1hiqho3u3xd&st=f857nnom&dl=0" },
+            
+            // Kelompok Bab4
+            { character: "两", pinyin: "liǎng", meaning: "dua", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/nfnnshcba58ytpwgikbdp/.mp3?rlkey=ldrkl1y3tln469176eug0osxj&st=v4r9u2u1&dl=0 " },
+            { character: "介绍", pinyin: "jièshào", meaning: "memperkenalkan", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/ga4zwpl39dpz4nphjqg7o/.mp3?rlkey=pf8nx1iusu1yrbyxn9rbp25jn&st=7k5vhg7t&dl=0 " },
+            { character: "已经", pinyin: "yǐjīng", meaning: "sudah/telah", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/nwosjgnfu1pumam6x1cdf/.mp3?rlkey=hnouyh3jakuaz6tdpziaxbwjy&st=lkdi9hn7&dl=0 " },
+            { character: "帮", pinyin: "bāng", meaning: "membantu/menolong", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/8bnqeamm5mvvqxtj6p5zm/.mp3?rlkey=x6exvg3siqjnr7pe3yq0l86hd&st=m7sp46ek&dl=0 " },
+            { character: "开始", pinyin: "kāishǐ", meaning: "mulai", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/th9w34qu92tct0lh2cqqe/.mp3?rlkey=xaux23ra129dui1f41e114veg&st=csc79g2j&dl=0 " },
+            { character: "快乐", pinyin: "kuàilè", meaning: "bahagia", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/226z78shh1utbjfmfj921/.mp3?rlkey=jlvls1r94x7sd6exdaox4kd5r&st=24hglmlm&dl=0 " },
+            { character: "接", pinyin: "jiē", meaning: "menerima/menjemput", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/sk30619eganzugr1yxqe1/.mp3?rlkey=xmfgtn2u61h6e7wbr44qac1fx&st=y66hszc0&dl=0 " },
+            { character: "晚上", pinyin: "wǎnshang", meaning: "malam (hari)", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/ixjij2qtemieaitd983wv/.mp3?rlkey=629y36flrna6cr0wcp5jfa8if&st=9i8wnode&dl=0 " },
+            { character: "生日", pinyin: "shēngrì", meaning: "ulang tahun", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/bf8y08idkroejzh2pdyfn/.mp3?rlkey=exa9ftm9o98er2obdknmqbun0&st=84ls3psu&dl=0 " },
+            { character: "给", pinyin: "gěi", meaning: "memberi", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/qkq36gar77z9u5dbq5kjy/.mp3?rlkey=7ibgtxjkvjejw4c67g8w6e7az&st=b4zrhv1m&dl=0 " },
+            { character: "长", pinyin: "cháng", meaning: "panjang", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/v4ia3f0q13ljbu39b6j8i/.mp3?rlkey=jbye7gtfsazwgcbvjyyufadp1&st=0b3qdo2m&dl=0 " },
+            { character: "问", pinyin: "wèn", meaning: "bertanya", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/rgcdqorardlc347o9oset/.mp3?rlkey=9avr2n3z4adgbjjlxzkcwivov&st=jy8vfx7g&dl=0 " },
+            { character: "非常", pinyin: "fēicháng", meaning: "sangat", category: "Bab4", audio: " https://dl.dropboxusercontent.com/scl/fi/sajth0zjop63pbgmvx0y4/.mp3?rlkey=tcen5me1ye82o7nfqhnws04n9&st=zv5ee8yq&dl=0 " },
+
+            // Kelompok Bab5
+            { character: "不错", pinyin: "búcuò", meaning: "lumayan/tidak salah", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/zu5znlpj9eixeg02ir9t9/.mp3?rlkey=z75z8hidsyo8btkex5ob3kbyb&st=7euvyw56&dl=0" },
+            { character: "以后", pinyin: "yǐhòu", meaning: "kelak/kemudian", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/5qg4bka21mhdww55sd6h4/.mp3?rlkey=ndugiw0zpldofac06puq29er9&st=28fwfs6f&dl=0" },
+            { character: "件", pinyin: "jiàn", meaning: "kata penggolong u/baju", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/qly4f0agiozelwaa4064e/.mp3?rlkey=0eysv44rwk1n0zchxfzxb1ftt&st=gqowy9lo&dl=0" },
+            { character: "准备", pinyin: "zhǔnbèi", meaning: "mempersiapkan", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/wzfbv1or1xj977ecazqi3/.mp3?rlkey=ak6dji7lsluow8pkr7m93sh0z&st=z3dmign8&dl=0" },
+            { character: "可以", pinyin: "kéyǐ", meaning: "boleh", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/dya6w76ask4bq1iu574lr/.mp3?rlkey=gcm4u7kb2p6wpwet3zb0dxex6&st=0kv0qwwl&dl=0" },
+            { character: "吧", pinyin: "ba", meaning: "partikel akhiran untuk ajakan (ayo)", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/fofybj4gqfs5wipz9poqa/.mp3?rlkey=y1d5fhmwam51qtc5cfwjz89mx&st=5y8fk1d5&dl=0" },
+            { character: "咖啡", pinyin: "kāfēi", meaning: "kopi", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/pvng3k29ra34kytfj9nle/.mp3?rlkey=y292frrohq4u1wyatitehbavg&st=bdc6eicj&dl=0" },
+            { character: "外面", pinyin: "wàimiàn", meaning: "(bagian) luar", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/l4h5g3b262f4dexkzqvov/.mp3?rlkey=magtjd94l9xpevxtidwn3vpxc&st=ed2g01rm&dl=0" },
+            { character: "对", pinyin: "duì", meaning: "benar/terhadap", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/urqu4xvx9zi5kkme7qfis/.mp3?rlkey=lv9qlyul522u34qvvdi8gp6fr&st=rf4hge5z&dl=0" },
+            { character: "就", pinyin: "jiù", meaning: "(adv) maka/lalu/langsung", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/j3pfa9w9zt77dyj3juci7/.mp3?rlkey=8fw8dhqx8b4bj8lpqjsr4q2cm&st=x703nnvo&dl=0" },
+            { character: "意思", pinyin: "yìsi", meaning: "arti/maksud", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/2xvq8qwerpkx45nkvjyex/.mp3?rlkey=wvi8n81athxdrtjhtr8ohax2i&st=cy87wbqy&dl=0" },
+            { character: "考试", pinyin: "kǎoshì", meaning: "ujian/ulangan", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/sns387ilaxw5blfdwselb/.mp3?rlkey=qdbcogsirzkkuo7cy2hu0fjey&st=otpose4c&dl=0" },
+            { character: "还", pinyin: "hái", meaning: "masih", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/gjue0ja9a6fziszhh5hgv/.mp3?rlkey=i29mi2cga9agnbdeohyk649rc&st=f73n4nqr&dl=0" },
+            { character: "鱼", pinyin: "yú", meaning: "ikan", category: "Bab5", audio: " https://dl.dropboxusercontent.com/scl/fi/aj4zk6rq1gpbpm180bb2d/.mp3?rlkey=2okc829vypzc8fv0odpgp5gtd&st=vikq63gp&dl=0" },
+
+		// kelompok bab 6
+            { character: "公斤", pinyin: "gōngjīn", meaning: "kilogram(kg)", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/72cmyefa9xg27dsmdmhpv/.mp3?rlkey=8wzcfrcfno71a681qkxpgsj10&st=jxb2h7ar&dl=0" },
+            { character: "因为", pinyin: "yīnwèi", meaning: "karena", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/mskvi1uwl8d9zjptef6st/.mp3?rlkey=l29drod3phyvgk8cib8ovuzv3&st=gvlkfqv2&dl=0" },
+            { character: "外", pinyin: "wài", meaning: "luar", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/f2ozeneu458hxb61tc7ci/.mp3?rlkey=lqgw2guyy1rzofugkrplvbomi&st=sd4gjiok&dl=0" },
+            { character: "好吃", pinyin: "hǎochī", meaning: "enak", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/pam9vegq0a16ojgop3rmp/.mp3?rlkey=hd3t9r51phjjnrp0nkdxz8vjw&st=pxcwe1xi&dl=0" },
+            { character: "姐姐", pinyin: "jiějie", meaning: "kakak (perempuan)", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/31jfzjr2dq1w66mx5iasn/.mp3?rlkey=u44t73bttzd2k4thqcdd17o4z&st=naw1xe8z&dl=0" },
+            { character: "所以", pinyin: "suóyǐ", meaning: "maka/jadi", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/4klq5qrsxid7xtu9hs97m/.mp3?rlkey=ezxxa9ktj1md8978oh7a9zxcf&st=4ixmsrhb&dl=0" },
+            { character: "打篮球", pinyin: "dǎ lánqiú", meaning: "bermain bola basket", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/iumay5q33yzegqaglywcx/.mp3?rlkey=3v2ntuhljcokqom7sd19x5cfj&st=6ow7fa5z&dl=0" },
+            { character: "游泳", pinyin: "yóuyǒng", meaning: "berenang", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/q7bykcrpxd3wq0v5scajq/.mp3?rlkey=8tzjbnc1boabg1cd9ma3csos4&st=jmoqctng&dl=0" },
+            { character: "经常", pinyin: "jīngcháng", meaning: "sering", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/gj8tj74iul5fcyu8t2keo/.mp3?rlkey=wgoaf2yfc0io6a5j8fs9lk9hl&st=rbie997e&dl=0" },
+            { character: "羊肉", pinyin: "yángròu", meaning: "daging kambing", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/7kxf0uidhqndogmodab7d/.mp3?rlkey=jd4ln92ydxey07vyymfohb8ov&st=j6qlp3j2&dl=0" },
+            { character: "自行车", pinyin: "zìxíngchē", meaning: "sepeda", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/dtphjz7qh0qkejrc1zi8m/.mp3?rlkey=mtpaqgfk2wk00g2gha2kzae2a&st=jwi7bys2&dl=0" },
+            { character: "门", pinyin: "mén", meaning: "pintu", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/sbhp6rgwrhan9e1z7a7u7/.mp3?rlkey=5wd8i149z6lzqaau3ag10pzux&st=e2p6rv85&dl=0" },
+            { character: "面条", pinyin: "miàntiáo", meaning: "mie", category: "Bab6", audio: "https://dl.dropboxusercontent.com/scl/fi/gf7qrehhfwkyjh8e8do1v/.mp3?rlkey=ejp940j50kuyfgds0p4iiqtfo&st=lfzjw54x&dl=0" },
+
+
+		// kelompok bab 7
+            { character: "公共汽车", pinyin: "gōnggòng qìchē", meaning: "bis/bus", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/q1pgnoy3k5faqrivdf4m5/.mp3?rlkey=2bhbs3u5zm8a00y1isfb3ez1v&st=16h0la4m&dl=0" },
+            { character: "公司", pinyin: "gōngsī", meaning: "perusahaan", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/41gprqp5l2vchamun2l2d/.mp3?rlkey=g7000me2bkxu1b1zej7h2429n&st=nyzzu67d&dl=0" },
+            { character: "到", pinyin: "dào", meaning: "sampai/tiba", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/lbicxmn7o3eqk66vfveii/.mp3?rlkey=lc8bevr2243edc9e8qmx2a33p&st=hel3a6fy&dl=0" },
+            { character: "小时", pinyin: "xiǎoshí", meaning: "jam", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/i72e1aftbi1cpy1iksla2/.mp3?rlkey=mgd9o8gv6n9awvukindppzt8b&st=aexgqi1p&dl=0" },
+            { character: "快", pinyin: "kuài", meaning: "cepat", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/jbrijohgb3bf3te2ohf4y/.mp3?rlkey=oj33r2kj4qbdn0iv64l7ekyr4&st=rrtgxhrf&dl=0" },
+            { character: "慢", pinyin: "màn", meaning: "lambat/perlahan", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/lq60ji0zelg3rf6f7mspd/.mp3?rlkey=ye50k3u7zjww03l5w66nm1r58&st=get8efpg&dl=0" },
+            { character: "教室", pinyin: "jiaàshì", meaning: "ruang kelas", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/6lae73ppk30fvdxx8tuwj/.mp3?rlkey=s2k9s4iodjwz3d85v52mnufon&st=fbu3e9j1&dl=0" },
+            { character: "机场", pinyin: "jīchǎng", meaning: "bandara", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/zqzn2z00xgvpsqth1mt1c/.mp3?rlkey=yqo7j3qufo9qcd3j32t9aekpv&st=ezvzk875&dl=0" },
+            { character: "离", pinyin: "lí", meaning: "jarak", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/k6z9m9qy6nk7qu3jkb1wb/.mp3?rlkey=ioqvakao5647yp0i7449s81lj&st=lukdvq9e&dl=0" },
+            { character: "走", pinyin: "zǒu", meaning: "berjalan", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/fx2h38vm5w3bbrbgkvwo4/.mp3?rlkey=dxhhc9ur1sb7cy7gwn9f03bhg&st=bqt985a3&dl=0" },
+            { character: "路", pinyin: "lù", meaning: "jalan", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/0qtw8q27evadbm7apqdm2/.mp3?rlkey=zfnlc51sc6bcgwrmf5gp7jm7r&st=9cqetb2c&dl=0" },
+            { character: "过", pinyin: "guò", meaning: "melewati/merayakan/pernah", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/24er2zkerl2m0ktmp62o0/.mp3?rlkey=y35wdlhibplr0g66eguaaeo1a&st=lvxnbjv1&dl=0" },
+            { character: "远", pinyin: "yuǎn", meaning: "jauh", category: "Bab7", audio: "https://dl.dropboxusercontent.com/scl/fi/jzu6by4quv6wxucu346rv/.mp3?rlkey=tmtdxo5u932hco7uuemneakca&st=57crm9hs&dl=0" },
+
+		// kelompok bab 8  category: "Bab 8",
+
+            { character: "事情", pinyin: "shìqíng", meaning: "masalah/urusan/hal", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/uuywz6xc7wd3a8bn41eq6/.mp3?rlkey=imcfha40f9rmgstwr1ymcvsa0&st=sczctj2s&dl=0" },
+            { character: "再", pinyin: "zài", meaning: "(sekali) lagi ", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/z6tz8tkzazb5ycj9b37hw/.mp3?rlkey=k7sesoctge9btyc65pmsyw90x&st=9x9ctmm2&dl=0" },
+            { character: "告诉", pinyin: "gàosu", meaning: "memberitahu", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/pjg7kk0j7yzp0ajubdsmw/.mp3?rlkey=u43hgqm9op5hrwd02cyo5hiyo&st=68yvty7x&dl=0" },
+            { character: "找", pinyin: "zhǎo", meaning: "mencari", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/ih0mlmolyeyhyru0xurcx/.mp3?rlkey=ign7pueg29w699ffud54jztrc&st=7jvzl742&dl=0" },
+            { character: "服务员", pinyin: "fúwùyuán", meaning: "pelayan toko", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/d47kwviv402nq60j9j3my/.mp3?rlkey=g8ijhjl3kom7l72uq18kui5oj&st=zykkjnmj&dl=0" },
+            { character: "白", pinyin: "bái", meaning: "putih", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/jso0sfevvw9jzeye4bwlc/.mp3?rlkey=nod4i9blmzrohd9noqdhzd20f&st=wecpfuie&dl=0" },
+            { character: "等", pinyin: "děng", meaning: "tunggu/menunggu", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/b6nbwj1sk30s91y1ejvbl/.mp3?rlkey=onv64ktlu048lcipgxc1azcib&st=kywpivc8&dl=0" },
+            { character: "让", pinyin: "ràng", meaning: "membiarkan/menyuruh", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/yewyp0060xowcrfuqdpft/.mp3?rlkey=8m2fxrluz7dia70wydm1d0joa&st=t4f3j8pw&dl=0" },
+            { character: "贵", pinyin: "guì", meaning: "mahal", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/bl33604n7ug9gojo4x1x8/.mp3?rlkey=yl000yqd0oiymz5178imronsb&st=s6hn9ygc&dl=0" },
+            { character: "黑", pinyin: "hēi", meaning: "hitam", category: "Bab8", audio: "https://dl.dropboxusercontent.com/scl/fi/8h889t3jmy9gmkmxdlbtz/.mp3?rlkey=ubgz41rrb63p1a9xipmgqqbo7&st=g8g5kjz8&dl=0" },
+
+		// kelompok bab 9  category: "Bab9",
+            { character: "上班", pinyin: "shàngbān", meaning: "bekerja", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/7tb4k5msye0y0bcy2euom/.mp3?rlkey=mujeiu4radzfhcd83m3qhl2sq&st=ae50zuqc&dl=0" },
+            { character: "从", pinyin: "cóng", meaning: "dari", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/r6xafmva91ocjesqcv9ay/.mp3?rlkey=4wzyhk5p8swu4morfwtgviasp&st=hk9k4mem&dl=0" },
+            { character: "完", pinyin: "wán", meaning: "selesai", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/atxionhwwf56d2pgmm1iu/.mp3?rlkey=n6cb71o904n85s36oszmluai8&st=myazll33&dl=0" },
+            { character: "希望", pinyin: "xīwàng", meaning: "semoga/berharap", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/0786vmng8l0iscixzqlil/.mp3?rlkey=mb1gdkjpg18us8mpypom7jyp0&st=hgzqeg5z&dl=0" },
+            { character: "懂", pinyin: "dǒng", meaning: "mengerti", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/8egaxxax1mrr9fx6e1dnd/.mp3?rlkey=dft9ctndxb5fzrvi2780sqlxf&st=cji2zwe3&dl=0" },
+            { character: "欢迎", pinyin: "huānyíng", meaning: "menyambut/selamat datang", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/mh2dwt9f4dxwbd1lnrw88/.mp3?rlkey=jn5q760oo9anhtumufuy2bdqx&st=tslawkw9&dl=0" },
+            { character: "第一", pinyin: "dìyī", meaning: "(urutan) pertama", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/qtrl9frznbo9o6bf3uxrt/.mp3?rlkey=hnipoxdmiunrxsa6skdtjz727&st=puledbwj&dl=0" },
+            { character: "跳舞", pinyin: "tiàowǔ", meaning: "menari", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/ljf4373v7qkebl94he7xm/.mp3?rlkey=ad6gtj9j7qlmpr1r5to8fkv28&st=exxueo1q&dl=0" },
+            { character: "错", pinyin: "cuò", meaning: "salah", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/fpgbjudu8vtab247ur3tl/.mp3?rlkey=nwgmv5l0mjgpbq9y3w54hcu4m&st=irq0sd8d&dl=0" },
+            { character: "问题", pinyin: "wèntí", meaning: "pertanyaan/masalah", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/alik4nrbm4l3f74sspemp/.mp3?rlkey=e5ddm3bidt28rlx228wcu8xh8&st=sh7b4d5p&dl=0" },
+            { character: "题", pinyin: "tí", meaning: "pertanyaan/soal", category: "Bab9", audio: "https://dl.dropboxusercontent.com/scl/fi/94g2dwrln2y823bjnk7qe/.mp3?rlkey=l9g81a49c7imklldvg884su17&st=gm5aks47&dl=0" },
+
+		// kelompok bab 10  category: "Bab10",
+            { character: "别", pinyin: "bié", meaning: "jangan/lain(nya)", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/1bszko8zmuc93gkb4ymy0/.mp3?rlkey=hcw37hdgh3lc0gq4hqd6aa9ym&st=kt8xeekg&dl=0" },
+            { character: "哥哥", pinyin: "gēge", meaning: "kakak (laki-laki)", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/a4t0lio1s9r4cqw32enhb/.mp3?rlkey=m4pxqqddeq8l7u0xi2ubf2xdm&st=qk9tf17m&dl=0" },
+            { character: "帮助", pinyin: "bāngzhù", meaning: "membantu/menolong", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/v8czvkokg661klolu7iv4/.mp3?rlkey=so6mr4bg8dtv1ol67lgkzwiui&st=114suikr&dl=0" },
+            { character: "手机", pinyin: "shǒujī", meaning: "hp (telepon genggam)", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/f57ejebd5dpriy2sdpdly/.mp3?rlkey=5tm5iskcy5n7qc007mibewedl&st=454wsua0&dl=0" },
+            { character: "正在", pinyin: "zhèngzài", meaning: "sedang", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/ja37izzs5vh1nqbe6m1s8/.mp3?rlkey=rj8ndt6fygg2cm9idnhaxnw7f&st=4e55y61o&dl=0" },
+            { character: "洗", pinyin: "xǐ", meaning: "mencuci/membersihkan", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/xro3vz4p3kwfkd3e1eynu/.mp3?rlkey=x6yioove0tiqrjtcaco5lb39d&st=8a3aibj9&dl=0" },
+            { character: "西瓜", pinyin: "xīguā", meaning: "semangka", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/ix2ct8bvbpi3f5bomcn2t/.mp3?rlkey=zu47sun350iwfdqgsh0i0eg8t&st=tszm4n5s&dl=0" },
+            { character: "课", pinyin: "kè", meaning: "pelajaran", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/ykr79peafso7ptbe8xigv/.mp3?rlkey=yxykbwgaqzm0gfhs0hnlr7a88&st=oovsrn6t&dl=0" },
+            { character: "鸡蛋", pinyin: "jīdàn", meaning: "telur (ayam)", category: "Bab10", audio: "https://dl.dropboxusercontent.com/scl/fi/yyk3mv9ufhp43oy1h6evu/.mp3?rlkey=d4tdzjolutx5oqm5ihxg6xxv6&st=ehs5zfl4&dl=0" },
+
+		// kelompok bab 11  category: "Bab11",
+            { character: "便宜", pinyin: "piányi", meaning: "murah", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/pj3r5a1w5eyw85sstmzk4/.mp3?rlkey=smhi3hdjfo1brtaomfpe28lvj&st=8qro6n03&dl=0" },
+            { character: "去年", pinyin: "qù nián", meaning: "tahun lalu", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/4ls4pcu5p8q5rhaddl6cc/.mp3?rlkey=y89xwkex8ikjnm0cirla7fexn&st=ldiv5thb&dl=0" },
+            { character: "可能", pinyin: "kěnéng", meaning: "mungkin", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/uzjd3jp8p7ti2uieg2nmb/.mp3?rlkey=1yu1icdnrngow1shh1bhaderl&st=gg27w9pi&dl=0" },
+            { character: "右边", pinyin: "yòubian", meaning: "(sebelah) kanan", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/x9s0sacxltkcw1iv35ivl/.mp3?rlkey=2wp06a41ry2k2zfdy5r6ucwr1&st=72qg1nek&dl=0" },
+            { character: "唱歌", pinyin: "chànggē", meaning: "bernyanyi", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/qig9ogdzxuw1xw53vs4u6/.mp3?rlkey=n02rxeya2d8ihut0nrdgu8b20&st=ah3aoclz&dl=0" },
+            { character: "女", pinyin: "nǔ", meaning: "Perempuan/wanita", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/x1vyzyevcs4tr18gaosri/.mp3?rlkey=o2x5xkhbi8avmd8tfz9ysiw47&st=41x3lda7&dl=0" },
+            { character: "姓", pinyin: "xìng", meaning: "marga/nama keluarga", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/7ien4091aq2wz2dvmmm7l/.mp3?rlkey=oiz0tpmvithbdeizwz0qj1kpl&st=vewr63oi&dl=0" },
+            { character: "孩子", pinyin: "háizi", meaning: "anak", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/hgjyqiwusdjpwijzo0v96/.mp3?rlkey=nmqwc4q2xu3nq2tjzphsou6e2&st=ajwa3t9w&dl=0" },
+            { character: "比", pinyin: "bǐ", meaning: "daripada/dibanding", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/z54jzfv720zmolbdm04cw/.mp3?rlkey=1vta4i6rudt3ktp00difr6wrf&st=swuww77u&dl=0" },
+            { character: "男", pinyin: "nán", meaning: "laki-laki", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/d0v0nspfw98gjnrk950gf/.mp3?rlkey=6ymet68vbr10e55u9etir06r2&st=8l8ke3d2&dl=0" },
+            { character: "说话", pinyin: "shuōhuà", meaning: "berkata/berbicara", category: "Bab11", audio: "https://dl.dropboxusercontent.com/scl/fi/4g7yva884d848zb1j9jth/.mp3?rlkey=xflsl2woxy9vwul4wuk21aetq&st=e3x359yq&dl=0" },
+
+
+		// kelompok bab 12 category: "Bab12",
+            { character: "妻子", pinyin: "qīzi", meaning: "istri", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/th4di10p5axmt68rx2cx7/.mp3?rlkey=v4qr93ugols0tkckooarx87ww&st=irhqyufi&dl=0" },
+            { character: "度", pinyin: "dù", meaning: "derajat", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/r7g9fcsz3uytl1eqxfxp2/.mp3?rlkey=9s6mnx8qtdgayk71ea186y8vc&st=jq6vtkmx&dl=0" },
+            { character: "弟弟", pinyin: "dìdi", meaning: "adik (laki-laki)", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/ge44ggwu0lxlse9hoz1g9/.mp3?rlkey=7w8jxsvzhxwryogf927vf9acm&st=2cwi06jv&dl=0" },
+            { character: "得", pinyin: "de", meaning: "partikel digunakan setelah verb menyatakan pelengkap/hasil", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/cfkzn65m491rdif6bnl1l/.mp3?rlkey=be3ww3dunaublhbpeuknwr4t2&st=1at4s6by&dl=0" },
+            { character: "穿", pinyin: "chuān", meaning: "memakai", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/m3li4fhukxut1chozqymh/.mp3?rlkey=6otc0i8c6jn3m84iymyj41t81&st=pg80f1o1&dl=0" },
+            { character: "近", pinyin: "jìn", meaning: "dekat", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/0m29hfqumo18uzwbc3z0p/.mp3?rlkey=p148kow5egnn6upokfq9n91an&st=40gswdwj&dl=0" },
+            { character: "进", pinyin: "jìn", meaning: "masuk", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/tcplhf3pcztrrbcazais1/.mp3?rlkey=1zajsjhn1ccl6xlsq6awcx1ih&st=5k5wo9k1&dl=0" },
+            { character: "雪", pinyin: "xuě", meaning: "salju", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/erjg8tyjie9837vxhcmch/.mp3?rlkey=881057oaxsnw29fcvvnh3oei7&st=hncbw9yp&dl=0" },
+            { character: "零", pinyin: "líng", meaning: "nol", category: "Bab12", audio: "https://dl.dropboxusercontent.com/scl/fi/wolys89nc040zi7fx4go6/.mp3?rlkey=1rdrpaetxzjsgmpkt8tqglvdv&st=er44jdu5&dl=0" },
+
+		// kelompok bab 13  category: "Bab13",
+            { character: "一直", pinyin: "yìzhí", meaning: "terus/selalu", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/pavwa2fgj7lo02u2fvaie/.mp3?rlkey=94qxes234w0j81b6lqdmqqc30&st=eysf1976&dl=0" },
+            { character: "宾馆", pinyin: "bīnguǎn", meaning: "hotel", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/5kwa447x21t34k45396r0/.mp3?rlkey=6uxkwi5urp29ldwkaftf9jrhf&st=0yvqmjui&dl=0" },
+            { character: "往", pinyin: "wǎng", meaning: "menuju/mengarah", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/v6bm79ew781hbnckmb463/.mp3?rlkey=3tbinzh0cwi6gm1jcu8vjqu60&st=dmbrnzsa&dl=0" },
+            { character: "手", pinyin: "shǒu", meaning: "tangan", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/ia3paud16sz549e98ldab/.mp3?rlkey=3fxndtzkuyb74fqm24x8gunj9&st=b0ftelac&dl=0" },
+            { character: "拿", pinyin: "ná", meaning: "mengambil/ambil", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/7c8hhlydn4geeaxez511t/.mp3?rlkey=uzkawb8ic9ml67udmke615cub&st=7jwxhj9v&dl=0" },
+            { character: "班", pinyin: "bān", meaning: "kelas", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/dieq7dgb500jo0m1qkzgb/.mp3?rlkey=yuq4xld3qwnh3tdm0rgsojj74&st=ycfi1eh9&dl=0" },
+            { character: "着", pinyin: "zhe", meaning: "mengikuti verb menyatakan kegiatan sedang berlangsung", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/3htvuqocwhgdpgvv4g5qu/.mp3?rlkey=xz0zmv47fwc9wqhgnvxljjd52&st=mdorqsow&dl=0" },
+            { character: "笑", pinyin: "xiào", meaning: "tertawa/tersenyum", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/v9ho4vk8e1g6o13skqrmk/.mp3?rlkey=f3yrq505js1uzowrb62dggsvu&st=jpkkpb9o&dl=0" },
+            { character: "路口", pinyin: "lùkǒu", meaning: "persimpangan", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/ea85of18l3tv3tksy979a/.mp3?rlkey=3z4c0majxs2v4398qyipsacvh&st=za88mtwf&dl=0" },
+            { character: "铅笔", pinyin: "qiānbǐ", meaning: "pensil", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/p17pgb3pjam1z12vdzygi/.mp3?rlkey=ji0tdinburv6swljyxflvu5qq&st=i4696l1v&dl=0" },
+            { character: "长", pinyin: "zháng", meaning: "tumbuh", category: "Bab13", audio: "https://dl.dropboxusercontent.com/scl/fi/czs296yj7w308u9dtdp2q/.mp3?rlkey=kbfzbpp8ns98pfhgl4oqhsux9&st=tikhn9vh&dl=0" },
+
+
+		// kelompok bab 14
+            { character: "但是", pinyin: "dànshì", meaning: "tapi/tetapi", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/pkelm53tv7jugfsp6er8t/.mp3?rlkey=a1ac9ab9kst1u27f4b9mnlhak&st=i57s3j6r&dl=0" },
+            { character: "晴", pinyin: "qíng", meaning: "cerah", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/ws7onrj7jih5udau5zilb/.mp3?rlkey=83sd09hpp74tlg7x5036xmzu2&st=t2jsidc0&dl=0" },
+            { character: "有意思", pinyin: "yǒuyìsi", meaning: "menarik", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/3yn6nvoltv6m6tw8j1uw8/.mp3?rlkey=6uo2zldjszesieks8j62qsk3f&st=nwm114wy&dl=0" },
+            { character: "次", pinyin: "cì", meaning: "…kali", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/kstnf235wq00gbde4slnz/.mp3?rlkey=r4ufweldg4iuitxve8sp6mvu6&st=bqgvth0m&dl=0" },
+            { character: "玩儿", pinyin: "wánr", meaning: "bermain", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/1q2inx5vbaszau8eb264h/.mp3?rlkey=47qfi15dp398cz5694g1z8810&st=e3mqbxkj&dl=0" },
+            { character: "百", pinyin: "bǎi", meaning: "ratus", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/l653toi3m3b1ropbus0if/.mp3?rlkey=g1dpk9pogbphbpc5yjny2a2vy&st=6enjo9tx&dl=0" },
+            { character: "虽然", pinyin: "suīrán", meaning: "walaupun/meskipun", category: "Bab14", audio: "https://dl.dropboxusercontent.com/scl/fi/emz51lw9zfiye32oshhrl/.mp3?rlkey=lb0vuejot3xaynau0f7hp3nrg&st=v4mc7uhe&dl=0" },
+
+		// kelompok bab 15
+            { character: "大家", pinyin: "dàjiā", meaning: "semuanya", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/ojyvikm6b80mmr07e04vw/.mp3?rlkey=w4vb2y2dydqwlq62uaepfsy12&st=c3nmwogt&dl=0" },
+            { character: "妹妹", pinyin: "mèimei", meaning: "adik (perempuan)", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/gnblbqz13ts2volfuclg1/.mp3?rlkey=qjngeoz9tzyqfyuoyznw37che&st=wy7xpafh&dl=0" },
+            { character: "新年", pinyin: "xīnnián", meaning: "tahun baru", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/3l4azkrv87trkw1daucy0/.mp3?rlkey=cgbfdip4opwgsojtj3p2x0b15&st=l8mzm0b9&dl=0" },
+            { character: "日", pinyin: "rì", meaning: "hari/tanggal", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/ec7k6u6gu206gfkc9h9ii/.mp3?rlkey=d3rjsv04shd05mf0a8z795zuv&st=mdhzjk7n&dl=0" },
+            { character: "更", pinyin: "gēng", meaning: "makin", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/u4o8i8mni37u6uipzufbw/.mp3?rlkey=g8kps58u779dmhqarmpztxr6w&st=hryz74hr&dl=0" },
+            { character: "火车站", pinyin: "huǒchēzhàn", meaning: "stasiun kereta", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/eyg5x0v2pd5cztiogb984/.mp3?rlkey=qwrc2q1cxmkuol8j5bkv38xan&st=ky8dy13s&dl=0" },
+            { character: "票", pinyin: "piào", meaning: "tiket", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/39b62mtumlcsjkcw6vuze/.mp3?rlkey=id1ugeo6rb18815f0ag1h2cmg&st=riu0kao9&dl=0" },
+            { character: "阴", pinyin: "yīn", meaning: "mendung/berawan", category: "Bab15", audio: "https://dl.dropboxusercontent.com/scl/fi/1fw21df0f1qs3su1piga5/.mp3?rlkey=kcijfgf0pq2c8gbxkpuzhegko&st=fn7cacfv&dl=0" }
+
+//            { character: "五", pinyin: "wǔ", meaning: "lima", category: "Bab15", //audio: "audio/wu.mp3" }
+        ];
+
+        // Game state
+        let currentMode = 'flashcard';
+        let currentCategory = 'all';
+        let currentIndex = 0;
+        let score = 0;
+        let quizQuestions = [];
+        let currentQuizQuestion = 0;
+        let currentDictationWord = null;
+        let filteredVocabulary = [...vocabulary];
+        
+        // Initialize the app
+        function init() {
+            updateFlashcard();
+            setupQuizMode();
+            
+            // For demo purposes, we'll use placeholder audio
+            // In real implementation, replace with actual audio files
+            vocabulary.forEach(word => {
+                if (!word.audio) {
+                    word.audio = `https://www.mandarinchineseschool.com/audios/${word.pinyin}.mp3`;
+                }
+            });
+        }
+        
+        // Category switching
+        function setCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter vocabulary based on category
+            if (category === 'all') {
+                filteredVocabulary = [...vocabulary];
+            } else {
+                filteredVocabulary = vocabulary.filter(word => word.category === category);
+            }
+            
+            // Reset index
+            currentIndex = 0;
+            
+            // Update display based on current mode
+            if (currentMode === 'flashcard') {
+                updateFlashcard();
+            } else if (currentMode === 'quiz') {
+                setupQuizMode();
+                currentQuizQuestion = 0;
+                showQuizQuestion();
+            } else if (currentMode === 'dictation') {
+                setupDictation();
+            }
+        }
+        
+        // Mode switching
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Hide all modes
+            document.querySelectorAll('.mode-content').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Show selected mode
+            document.getElementById(`${mode}-mode`).style.display = 'block';
+            
+            // Update active button
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reset quiz/dictation if needed
+            if (mode === 'quiz') {
+                currentQuizQuestion = 0;
+                showQuizQuestion();
+            } else if (mode === 'dictation') {
+                setupDictation();
+            }
+        }
+        
+        // Flashcard functions
+        function updateFlashcard() {
+            if (filteredVocabulary.length === 0) {
+                document.getElementById('fc-character').textContent = "无";
+                document.getElementById('fc-pinyin').textContent = "wú";
+                document.getElementById('fc-meaning').textContent = "tidak ada";
+                return;
+            }
+            
+            const word = filteredVocabulary[currentIndex];
+            document.getElementById('fc-character').textContent = word.character;
+            document.getElementById('fc-pinyin').textContent = word.pinyin;
+            document.getElementById('fc-meaning').textContent = word.meaning;
+        }
+        
+        function nextCard() {
+            if (filteredVocabulary.length === 0) return;
+            currentIndex = (currentIndex + 1) % filteredVocabulary.length;
+            updateFlashcard();
+        }
+        
+        function prevCard() {
+            if (filteredVocabulary.length === 0) return;
+            currentIndex = (currentIndex - 1 + filteredVocabulary.length) % filteredVocabulary.length;
+            updateFlashcard();
+        }
+        
+        function shuffleCards() {
+            if (filteredVocabulary.length === 0) return;
+            
+            // Fisher-Yates shuffle algorithm
+            for (let i = filteredVocabulary.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredVocabulary[i], filteredVocabulary[j]] = [filteredVocabulary[j], filteredVocabulary[i]];
+            }
+            currentIndex = 0;
+            updateFlashcard();
+            
+            // Also reshuffle quiz questions
+            setupQuizMode();
+        }
+        
+        function playCurrentAudio() {
+            if (filteredVocabulary.length === 0) return;
+            const word = filteredVocabulary[currentIndex];
+            playAudio(word.audio);
+        }
+        
+        // Quiz mode functions
+        function setupQuizMode() {
+            // Create a copy of filtered vocabulary for quiz questions
+            quizQuestions = [...filteredVocabulary];
+            
+            // Shuffle questions
+            for (let i = quizQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizQuestions[i], quizQuestions[j]] = [quizQuestions[j], quizQuestions[i]];
+            }
+            
+            // Reset score
+            score = 0;
+            updateScore();
+        }
+        
+        function showQuizQuestion() {
+            if (quizQuestions.length === 0) {
+                document.getElementById('quiz-question').textContent = "Tidak ada kosakata dBab2 kategori ini";
+                document.getElementById('quiz-character').textContent = "";
+                document.getElementById('quiz-options').innerHTML = '';
+                document.getElementById('quiz-feedback').textContent = '';
+                document.getElementById('quiz-next').style.display = 'none';
+                return;
+            }
+            
+            if (currentQuizQuestion >= quizQuestions.length) {
+                // Quiz finished
+                document.getElementById('quiz-question').textContent = "Kuis Selesai!";
+                document.getElementById('quiz-character').textContent = `Skor Anda: ${score}/${quizQuestions.length}`;
+                document.getElementById('quiz-options').innerHTML = '';
+                document.getElementById('quiz-feedback').textContent = '';
+                document.getElementById('quiz-next').style.display = 'none';
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizQuestion];
+            document.getElementById('quiz-character').textContent = question.character;
+            
+            // Generate options (correct answer + 3 random wrong answers)
+            const options = [question.meaning];
+            while (options.length < 4) {
+                const randomWord = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+                if (!options.includes(randomWord.meaning)) {
+                    options.push(randomWord.meaning);
+                }
+            }
+            
+            // Shuffle options
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            // Display options
+            const optionsHtml = options.map(option => 
+                `<div class="quiz-option" onclick="checkAnswer('${option}', '${question.meaning}')">${option}</div>`
+            ).join('');
+            
+            document.getElementById('quiz-options').innerHTML = optionsHtml;
+            document.getElementById('quiz-feedback').textContent = '';
+            document.getElementById('quiz-next').style.display = 'none';
+        }
+        
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+                if (option.textContent === correctAnswer) {
+                    option.classList.add('correct');
+                }
+                if (option.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none'; // Disable further clicks
+            });
+            
+            if (selectedAnswer === correctAnswer) {
+                document.getElementById('quiz-feedback').textContent = "Benar! 👍";
+                document.getElementById('quiz-feedback').style.color = "green";
+                score++;
+            } else {
+                document.getElementById('quiz-feedback').textContent = `Salah! Jawaban benar: ${correctAnswer}`;
+                document.getElementById('quiz-feedback').style.color = "red";
+            }
+            
+            updateScore();
+            document.getElementById('quiz-next').style.display = 'inline-block';
+        }
+        
+        function nextQuizQuestion() {
+            currentQuizQuestion++;
+            showQuizQuestion();
+        }
+        
+        // Dictation mode functions
+        function setupDictation() {
+            if (filteredVocabulary.length === 0) {
+                document.getElementById('dictation-feedback').textContent = "Tidak ada kosakata dBab2 kategori ini";
+                return;
+            }
+            
+            // Select a random word from filtered vocabulary for dictation
+            const randomIndex = Math.floor(Math.random() * filteredVocabulary.length);
+            currentDictationWord = filteredVocabulary[randomIndex];
+            
+            // Reset UI
+            document.getElementById('dictation-input').value = '';
+            document.getElementById('dictation-feedback').textContent = '';
+            document.getElementById('dictation-next').style.display = 'none';
+        }
+        
+        function playDictationAudio() {
+            if (!currentDictationWord) return;
+            playAudio(currentDictationWord.audio);
+        }
+        
+        function checkDictation() {
+            if (!currentDictationWord) return;
+            
+            const userInput = document.getElementById('dictation-input').value.trim();
+            if (userInput === currentDictationWord.character) {
+                document.getElementById('dictation-feedback').textContent = "Benar! 👍";
+                document.getElementById('dictation-feedback').style.color = "green";
+                score++;
+            } else {
+                document.getElementById('dictation-feedback').textContent = 
+                    `Salah! Jawaban benar: ${currentDictationWord.character} (${currentDictationWord.pinyin}) - ${currentDictationWord.meaning}`;
+                document.getElementById('dictation-feedback').style.color = "red";
+            }
+            
+            updateScore();
+            document.getElementById('dictation-next').style.display = 'inline-block';
+        }
+        
+        function nextDictation() {
+            setupDictation();
+        }
+        
+        // Utility functions
+        function playAudio(url) {
+            try {
+                new Audio(url).play();
+            } catch (e) {
+                console.error("Error playing audio:", e);
+                alert("File audio tidak ditemukan. Pastikan file ada di folder audio");
+            }
+        }
+        
+        function updateScore() {
+            const total = currentMode === 'quiz' ? quizQuestions.length : 
+                         currentMode === 'dictation' ? score : 0;
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = total;
+        }
+        
+        // Initialize the app when page loads
+        window.onload = init;
+    </script>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teks Berjalan</title>
+    <style>
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            background-color: #f1f1f1;
+            padding: 10px;
+        }
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="marquee">
+        <span>Copyright (c) Effendi-08994477998 - Terima kasih apabila anda bersedia membantu karya ini dalam bentuk donasi baik berupa gopay/ovo/shopee pay/BI-FAst ke nomor 08994477998 - Semoga anda & keluarga diberkahi</span>
+    </div>
+</body>
+</html>
+
+</body>
+</html>
